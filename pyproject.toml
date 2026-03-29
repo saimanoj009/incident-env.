@@ -1,18 +1,13 @@
 [project]
 name = "incident-env"
 version = "0.1.0"
-description = "AI Incident Response OpenEnv"
-authors = [
-  {name = "Manoj"}
-]
+description = "Incident Response OpenEnv"
+requires-python = ">=3.9"
+
 dependencies = [
-  "fastapi",
-  "uvicorn",
-  "openenv-core>=0.2.0"
+    "fastapi",
+    "uvicorn"
 ]
 
 [project.scripts]
-start = "server.app:app"
-
-[tool.setuptools]
-packages = ["env", "api", "grader", "server"]
+server = "server.app:main"
