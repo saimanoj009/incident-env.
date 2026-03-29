@@ -14,6 +14,7 @@ def home():
     return {"message": "Incident Response OpenEnv Running"}
 
 @app.get("/reset")
+@app.post("/reset")
 def reset():
     return env.reset()
 
