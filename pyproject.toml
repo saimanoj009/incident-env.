@@ -1,0 +1,14 @@
+[project]
+name = "incident-env"
+version = "0.1.0"
+description = "AI Incident Response OpenEnv"
+authors = [
+  {name = "Manoj"}
+]
+dependencies = [
+  "fastapi",
+  "uvicorn"
+]
+
+[tool.setuptools]
+packages = ["env", "api", "grader"]
