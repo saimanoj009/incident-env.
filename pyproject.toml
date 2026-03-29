@@ -7,8 +7,12 @@ authors = [
 ]
 dependencies = [
   "fastapi",
-  "uvicorn"
+  "uvicorn",
+  "openenv-core>=0.2.0"
 ]
 
+[project.scripts]
+start = "server.app:app"
+
 [tool.setuptools]
-packages = ["env", "api", "grader"]
+packages = ["env", "api", "grader", "server"]
