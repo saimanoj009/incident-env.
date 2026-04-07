@@ -1,24 +1,37 @@
+import os
 import requests
 
-BASE_URL = "https://saimanoj1405-incident-env.hf.space"
+BASE_URL = os.environ.get("API_BASE_URL")
+API_KEY = os.environ.get("API_KEY")
+
+HEADERS = {
+    "Authorization": f"Bearer {API_KEY}"
+}
 
 def run_task(task_name):
     print(f"[START] {task_name}", flush=True)
 
-    # Reset environment (POST required)
-    res = requests.post(f"{BASE_URL}/reset")
-    state = res.json()
+    try:
+        res = requests.post(f"{BASE_URL}/reset", headers=HEADERS)
+        state = res.json()
+    except Exception:
+        print(f"[END] {task_name} score=0", flush=True)
+        return
 
     total_reward = 0
 
     for step in range(10):
-        # Auto agent step
-        res = requests.get(f"{BASE_URL}/auto-step")
-        data = res.json()
+        try:
+            res = requests.get(f"{BASE_URL}/auto-step", headers=HEADERS)
+            data = res.json()
 
-        result = data.get("result", {})
-        reward = result.get("reward", 0)
-        done = result.get("done", False)
+            result = data.get("result", {})
+            reward = result.get("reward", 0)
+            done = result.get("done", False)
+
+        except Exception:
+            reward = 0
+            done = True
 
         total_reward += reward
 
