@@ -3,28 +3,24 @@ import random
 class IncidentEnv:
     def __init__(self):
         self.state_data = None
-        self.current_scenario = None
         self.history = []
 
     def reset(self):
         scenarios = [
             {
                 "id": "easy",
-                "logs": "High CPU usage detected",
-                "metrics": {"cpu": 95, "memory": 60},
-                "solution": ["analyze_logs", "restart_service"]
+                "logs": "Warning: CPU usage increased to 85%, monitoring required",
+                "metrics": {"cpu": random.randint(80, 90), "memory": random.randint(50, 70)}
             },
             {
                 "id": "medium",
-                "logs": "Memory leak detected",
-                "metrics": {"cpu": 60, "memory": 92},
-                "solution": ["analyze_logs", "clear_cache", "restart_service"]
+                "logs": "Alert: Memory leak detected in backend service, usage above 90%",
+                "metrics": {"cpu": random.randint(60, 80), "memory": random.randint(85, 95)}
             },
             {
                 "id": "hard",
-                "logs": "Multiple failures: CPU + Memory",
-                "metrics": {"cpu": 90, "memory": 90},
-                "solution": ["analyze_logs", "scale_up", "clear_cache", "restart_service"]
+                "logs": "Critical Failure: CPU spike and memory overload detected simultaneously",
+                "metrics": {"cpu": random.randint(85, 98), "memory": random.randint(85, 98)}
             }
         ]
 
@@ -46,25 +42,54 @@ class IncidentEnv:
         self.state_data["attempts"] += 1
         self.history.append(action)
 
+        cpu = self.state_data["metrics"]["cpu"]
+        memory = self.state_data["metrics"]["memory"]
+
         reward = 0
         done = False
-        solution = self.current_scenario["solution"]
 
-        if action not in solution:
+        # 🔥 Action-based logic (realistic system behavior)
+
+        if action == "scale_down_cpu":
+            if cpu > 80:
+                self.state_data["metrics"]["cpu"] -= 30
+                reward += 0.8
+            else:
+                reward -= 0.2
+
+        elif action == "restart_service":
+            if memory > 80:
+                self.state_data["metrics"]["memory"] -= 40
+                reward += 0.8
+            else:
+                reward -= 0.2
+
+        elif action == "clear_cache":
+            if memory > 70:
+                self.state_data["metrics"]["memory"] -= 25
+                reward += 0.6
+            else:
+                reward -= 0.1
+
+        elif action == "analyze_logs":
+            reward += 0.3
+
+        elif action == "scale_up":
+            if cpu > 75:
+                self.state_data["metrics"]["cpu"] -= 20
+                reward += 0.5
+            else:
+                reward -= 0.2
+
+        elif action == "monitor":
+            reward += 0.2
+
+        else:
             reward -= 0.3
 
-        if len(self.history) <= len(solution) and action == solution[len(self.history)-1]:
-            reward += 0.5
-        else:
-            reward -= 0.1
-
-        if self.history == solution:
-            reward += 1.0
+        if self.state_data["metrics"]["cpu"] < 60 and self.state_data["metrics"]["memory"] < 60:
             done = True
-
-        if done and self.state_data["attempts"] <= len(solution):
-            reward += 0.5
-
+            reward += 1.0
         self.state_data["done"] = done
         self.state_data["history"] = self.history
 
